@@ -1,0 +1,27 @@
+services:
+  - app
+  - authentication
+  - brownbag
+  - budget
+  - category
+  - company
+  - department
+  - email
+  - employee
+  - feedback
+  - gateway
+  - training
+
+types:
+  - service
+  - mongodb
+
+environment: dev
+
+nodeEnv: development
+
+subdomain: feature.
+
+sendgridKey: U0cuNTJKNG1xRW1UMEd1dTJjeFo0bmk4dy5qLWQzb191Z0VfejM0QnlQdlY2X0x0WVlDNjM4UXc0bF9zTFpnM2RReDVFCg==
+
+redisHost: gateway-redis-service.sproud-feature.svc.cluster.local

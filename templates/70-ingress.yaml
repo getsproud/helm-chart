@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sproud-{{ .Values.environment }}-ingress
+  namespace: sproud
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/load-balance: "round_robin"
+spec:
+  rules:
+  - host: {{ .Values.subdomain }}sproud.{{ .Values.environment }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: gateway-service
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  - host: api.{{ .Values.subdomain }}sproud.{{ .Values.environment }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: gateway-service
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  - host: join.{{ .Values.subdomain }}sproud.{{ .Values.environment }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: gateway-service
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  - host: "*.{{ .Values.subdomain }}sproud.{{ .Values.environment }}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: app-service
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - {{ .Values.subdomain }}sproud.{{ .Values.environment }}
+    - '*.{{ .Values.subdomain }}sproud.{{ .Values.environment }}'
+    secretName: {{ .Values.subdomain }}sproud-{{ .Values.environment }}-secret

@@ -1,0 +1,25 @@
+{{- range $service := .Values.services }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ $service }}-app
+  name: {{ $service }}-service
+spec:
+  ports:
+  {{- if eq $service "gateway" }}
+  - name: http
+    port: 80
+    targetPort: 8080
+  {{- else if eq $service "app" }}
+  - name: http
+    port: 80
+    targetPort: 3000
+  {{- else }}
+  - protocol: TCP
+    port: 50051
+  {{- end }}
+  selector:
+    app: {{ $service }}-app
+---
+{{- end }}

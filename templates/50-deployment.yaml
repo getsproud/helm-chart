@@ -1,0 +1,91 @@
+{{- range .Values.services }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ . }}-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ . }}-app
+  template:
+    metadata:
+      labels:
+        app: {{ . }}-app
+    spec:
+      containers:
+      - name: {{ . }}-service
+        image: ghcr.io/getsproud/{{ . }}:latest
+        imagePullPolicy: Always
+        readinessProbe:
+          {{- if and (ne . "gateway") (ne . "app") }}
+          tcpSocket:
+            port: 50051
+          {{- else if eq . "app"}}
+          httpGet:
+            path: /
+            port: 3000
+          {{- else }}
+          httpGet:
+            path: /healthz/readiness/{{ . }}
+            port: 8080
+          {{- end }}
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        livenessProbe:
+          {{- if and (ne . "gateway") (ne . "app") }}
+          tcpSocket:
+            port: 50051
+          {{- else if eq . "app"}}
+          httpGet:
+            path: /
+            port: 3000
+          {{- else }}
+          httpGet:
+            path: /healthz/liveness/{{ . }}
+            port: 8080
+          {{- end }}
+          initialDelaySeconds: 60
+          periodSeconds: 15
+        ports:
+        {{- if eq . "gateway" }}
+        - containerPort: 8080
+          protocol: TCP
+        {{- else if eq . "email" }}
+        - containerPort: 50051
+          protocol: TCP
+        - containerPort: 8080
+          protocol: TCP
+        {{- else }}
+        - containerPort: 50051
+          protocol: TCP
+        {{- end }}
+        env:
+        - name: DOMAIN
+          value: {{ $.Values.domain }}.{{ $.Values.environment }}
+        - name: NODE_ENV
+          value: {{ $.Values.nodeEnv }}
+        - name: COTE_DISCOVERY_REDIS_HOST
+          value: {{ $.Values.redisHost }}
+        - name: DISCOVERY_HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        {{- if and (ne . "app") (ne . "gateway" ) }}
+        - name: MONGO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-cluster-developer-password
+              key: password
+        - name: MONGO_USER
+          value: developer
+        {{- end }}
+        {{- if eq . "email" }}
+        envFrom:
+        - secretRef:
+            name: sendgrid-secret
+        {{- end }}
+      imagePullSecrets:
+      - name: gh-registry
+---
+{{- end }}

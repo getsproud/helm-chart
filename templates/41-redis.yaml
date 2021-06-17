@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gateway-redis
+  labels:
+    app: gateway-redis
+spec:
+  containers:
+  - image: redis:6.0.9
+    name: gateway-redis
+    command:
+      - "redis-server"
+    args:
+      - "/etc/redis/redis.conf"
+      - "--protected-mode"
+      - "no"
+    ports:
+      - containerPort: 6379
+    volumeMounts:
+      - name: "redis-conf"
+        mountPath: "/etc/redis"
+
+      - name: gateway-redis-vol
+        mountPath: /var/lib/redis
+  volumes:
+    - name: gateway-redis-vol
+      persistentVolumeClaim:
+        claimName: sproud-redis-volume-claim-{{ .Values.environment }}
+    - name: "redis-conf"
+      configMap:
+        name: "redis-conf"
+        items:
+          - key: "redis.conf"
+            path: "redis.conf"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: gateway-redis
+  name: gateway-redis-service
+spec:
+  ports:
+  - name: http
+    port: 6379
+    targetPort: 6379
+  selector:
+    app: gateway-redis
+---

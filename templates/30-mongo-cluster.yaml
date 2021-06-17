@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongo-cluster-developer-password
+type: Opaque
+stringData:
+  password: Zk9v4xcKwAFPHcV9VX99qc2MfFsqn2Eb
