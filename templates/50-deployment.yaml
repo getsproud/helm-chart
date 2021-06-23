@@ -24,7 +24,11 @@ spec:
           {{- else if eq . "app"}}
           httpGet:
             path: /
+            {{- if eq $.Values.nodeEnv "stage" }}
+            port: 80
+            {{- else }}
             port: 3000
+            {{- end }}
           {{- else }}
           httpGet:
             path: /healthz/readiness/{{ . }}
@@ -39,7 +43,11 @@ spec:
           {{- else if eq . "app"}}
           httpGet:
             path: /
+            {{- if eq $.Values.nodeEnv "stage" }}
+            port: 80
+            {{- else }}
             port: 3000
+            {{- end }}
           {{- else }}
           httpGet:
             path: /healthz/liveness/{{ . }}
@@ -66,7 +74,7 @@ spec:
         - name: NODE_ENV
           value: {{ $.Values.nodeEnv }}
         - name: COTE_DISCOVERY_REDIS_HOST
-          value: {{ $.Values.redisHost }}
+          value: {{ $.Values.redis.host }}
         - name: DISCOVERY_HOSTNAME
           valueFrom:
             fieldRef:
@@ -78,7 +86,9 @@ spec:
               name: mongo-cluster-developer-password
               key: password
         - name: MONGO_USER
-          value: developer
+          value: {{ $.Values.mongo.user }}
+        - name: MONGO_HOST
+          value: {{ $.Values.mongo.host }}
         {{- end }}
         {{- if eq . "email" }}
         envFrom:

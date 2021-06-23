@@ -2,11 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: sproud-{{ .Values.environment }}-ingress
-  namespace: sproud
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: "/"
     nginx.ingress.kubernetes.io/load-balance: "round_robin"
 spec:
   rules:

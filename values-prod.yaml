@@ -12,18 +12,18 @@ services:
   - gateway
   - training
 
-environment: dev
+environment: io
 
-nodeEnv: development
+nodeEnv: production
 
-subdomain: feature.
+subdomain:
 
-sendgridKey: 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
+sendgridKey: U0cuNTJKNG1xRW1UMEd1dTJjeFo0bmk4dy5qLWQzb191Z0VfejM0QnlQdlY2X0x0WVlDNjM4UXc0bF9zTFpnM2RReDVFCg==
 
 redis:
-  host: gateway-redis-service.sproud-feature.svc.cluster.local
+  host: gateway-redis-service.sproud-prod.svc.cluster.local
 
 mongo:
   host: .divei.mongodb.net
-  user: sproud-dev
+  user: sproud-prod
   password: 2Rh3s2l5wCSMkPod

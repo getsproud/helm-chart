@@ -14,12 +14,18 @@ spec:
   {{- else if eq $service "app" }}
   - name: http
     port: 80
+    {{- if eq $.Values.nodeEnv "stage" }}
+    targetPort: 80
+    {{- else }}
     targetPort: 3000
+    {{- end }}
   {{- else }}
   - protocol: TCP
     port: 50051
   {{- end }}
   selector:
     app: {{ $service }}-app
+  type: LoadBalancer
+  externalTrafficPolicy: Local
 ---
 {{- end }}
