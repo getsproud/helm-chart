@@ -14,7 +14,7 @@ spec:
       paths:
       - backend:
           service:
-            name: gateway-service
+            name: api-gateway-service
             port:
               number: 80
         path: /
@@ -24,7 +24,7 @@ spec:
       paths:
       - backend:
           service:
-            name: gateway-service
+            name: api-gateway-service
             port:
               number: 80
         path: /
@@ -34,7 +34,7 @@ spec:
       paths:
       - backend:
           service:
-            name: gateway-service
+            name: api-gateway-service
             port:
               number: 80
         path: /
@@ -44,7 +44,7 @@ spec:
       paths:
       - backend:
           service:
-            name: app-service
+            name: react-app-service
             port:
               number: 80
         path: /

@@ -1,6 +1,6 @@
 services:
-  - app
-  - authentication
+  - react-app
+  - auth
   - brownbag
   - budget
   - category
@@ -9,7 +9,7 @@ services:
   - email
   - employee
   - feedback
-  - gateway
+  - api-gateway
   - training
 
 environment: dev
@@ -21,7 +21,8 @@ subdomain: feature.
 sendgridKey: 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
 
 redis:
-  host: gateway-redis-service.sproud-feature.svc.cluster.local
+  service: gateway-redis-service
+  namespace: sproud-feature
 
 mongo:
   host: .divei.mongodb.net

@@ -2,26 +2,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ . }}-app
+  name: {{ . }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ . }}-app
+      app: {{ . }}
   template:
     metadata:
       labels:
-        app: {{ . }}-app
+        app: {{ . }}
     spec:
       containers:
       - name: {{ . }}-service
         image: ghcr.io/getsproud/{{ . }}:latest
         imagePullPolicy: Always
         readinessProbe:
-          {{- if and (ne . "gateway") (ne . "app") }}
+          {{- if and (ne . "api-gateway") (ne . "react-app") }}
           tcpSocket:
             port: 50051
-          {{- else if eq . "app"}}
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          {{- else if eq . "react-app"}}
           httpGet:
             path: /
             {{- if eq $.Values.nodeEnv "stage" }}
@@ -29,18 +31,20 @@ spec:
             {{- else }}
             port: 3000
             {{- end }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
           {{- else }}
           httpGet:
             path: /healthz/readiness/{{ . }}
             port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 5
           {{- end }}
-          initialDelaySeconds: 60
-          periodSeconds: 30
         livenessProbe:
-          {{- if and (ne . "gateway") (ne . "app") }}
+          {{- if and (ne . "api-gateway") (ne . "react-app") }}
           tcpSocket:
             port: 50051
-          {{- else if eq . "app"}}
+          {{- else if eq . "react-app"}}
           httpGet:
             path: /
             {{- if eq $.Values.nodeEnv "stage" }}
@@ -54,9 +58,9 @@ spec:
             port: 8080
           {{- end }}
           initialDelaySeconds: 60
-          periodSeconds: 15
+          periodSeconds: 10
         ports:
-        {{- if eq . "gateway" }}
+        {{- if eq . "api-gateway" }}
         - containerPort: 8080
           protocol: TCP
         {{- else if eq . "email" }}
@@ -74,12 +78,12 @@ spec:
         - name: NODE_ENV
           value: {{ $.Values.nodeEnv }}
         - name: COTE_DISCOVERY_REDIS_HOST
-          value: {{ $.Values.redis.host }}
+          value: {{ $.Values.redis.service }}.{{ $.Values.redis.namespace}}.svc.cluster.local
         - name: DISCOVERY_HOSTNAME
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        {{- if and (ne . "app") (ne . "gateway" ) }}
+        {{- if and (ne . "react-app") (ne . "api-gateway" ) }}
         - name: MONGO_PASSWORD
           valueFrom:
             secretKeyRef:
