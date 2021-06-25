@@ -8,10 +8,12 @@ spec:
   selector:
     matchLabels:
       app: {{ . }}
+      feature: {{ trunc 1 $.Values.subdomain | quote }}
   template:
     metadata:
       labels:
         app: {{ . }}
+        feature: {{ trunc 1 $.Values.subdomain | quote }}
     spec:
       containers:
       - name: {{ . }}-service
@@ -67,6 +69,9 @@ spec:
         - containerPort: 50051
           protocol: TCP
         - containerPort: 8080
+          protocol: TCP
+        {{- else if eq . "react-app" }}
+        - containerPort: 3000
           protocol: TCP
         {{- else }}
         - containerPort: 50051

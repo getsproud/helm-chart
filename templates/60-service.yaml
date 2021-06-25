@@ -4,6 +4,7 @@ kind: Service
 metadata:
   labels:
     app: {{ $service }}
+    feature: {{ trunc 1 $.Values.subdomain | quote }}
   name: {{ $service }}-service
 spec:
   ports:
@@ -26,5 +27,6 @@ spec:
   {{- end }}
   selector:
     app: {{ $service }}
+    feature: {{ trunc 1 $.Values.subdomain | quote }}
 ---
 {{- end }}

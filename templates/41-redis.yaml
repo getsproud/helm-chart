@@ -4,6 +4,7 @@ metadata:
   name: gateway-redis
   labels:
     app: gateway-redis
+    feature: {{ trunc 1 $.Values.subdomain | quote }}
 spec:
   containers:
   - image: redis:6.0.9
@@ -38,6 +39,7 @@ kind: Service
 metadata:
   labels:
     app: gateway-redis
+    feature: {{ trunc 1 $.Values.subdomain | quote }}
   name: gateway-redis-service
 spec:
   ports:
@@ -46,4 +48,5 @@ spec:
     targetPort: 6379
   selector:
     app: gateway-redis
+    feature: {{ trunc 1 $.Values.subdomain | quote }}
 ---
